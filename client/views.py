@@ -1,13 +1,17 @@
 import math
 import random
+import uuid  
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
-from .models import Otp
-from .serializers import OtpSerializer
+from rest_framework import status, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import Otp, Image
+from .serializers import ImageSerializer, OtpSerializer
 
-from sms import send_sms
+from deepface import DeepFace
+
+
+# from sms import send_sms
 
 class OtpListApiView(APIView):
 
@@ -54,11 +58,16 @@ class VerifyOtpView(APIView):
 
         print(incomingOtp, mobile)
 
-        storedOtp= list(Otp.objects.filter(mobile = mobile, ).values_list('otp')[0])[0]
+        storedOtpList= list(Otp.objects.filter(mobile = mobile, ).values_list('otp'))      
+        storedOtpList.reverse()
 
-        print(storedOtp)
+        print('OTP list: ',storedOtpList)
 
-        if incomingOtp==storedOtp:
+        finalOtp= list(storedOtpList[0])[0]
+
+        print(finalOtp)
+
+        if incomingOtp==finalOtp:
             Otp.objects.filter(mobile = mobile ).delete()
             data= {
                 'msg': 'Successfully verified OTP'
@@ -67,3 +76,48 @@ class VerifyOtpView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ImageView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        
+        data= request.data
+        data['uniqueId']=  uuid.uuid1()
+        image_serializer = ImageSerializer(data=data)
+
+        if image_serializer.is_valid():
+            image_serializer.save()
+
+            # IMAGE MATCHING
+            # img1 is uploaded img
+            # img2 is fetched from block chain
+            # face_matching_data= DeepFace.verify(img1_path='', img2_path='')
+
+
+
+            # EMOTION DETECTION
+
+            emotions = DeepFace.analyze(img_path = "22.jpeg", 
+                        actions = ['age', 'gender', 'race', 'emotion']
+                    )
+            
+            dominant_emotion= emotions[0]['dominant_emotion']
+            dominant_emotion_value= emotions[0]['emotion']['{}'.format(dominant_emotion)]
+
+            # to be stored in block chain
+            emotion_Data= {
+                'dominant_emotion': dominant_emotion,
+                'dominant_emotion_value': dominant_emotion_value
+            }
+
+            if dominant_emotion== 'fear' and dominant_emotion_value>=80:
+                response_Data= {
+                    'emotion': 'Not in right state'
+                }
+                return Response(response_Data, status=status.HTTP_400_BAD_REQUEST)        
+
+            return Response(image_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
