@@ -20,7 +20,7 @@ backends = [
 # )
 # print(face_objs)
 
-emotions = DeepFace.analyze(img_path = "22.jpeg", 
+emotions = DeepFace.analyze(img_path = "/home/psk/Desktop/btp/django-auth/images/22.jpeg", 
         actions = ['emotion']
 )
 
