@@ -8,7 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Otp, Image, Election, ElectionCandidate
 from .serializers import ImageSerializer, OtpSerializer, ElectionSerializer, ElectionCandidateSerializer
 
-from deepface import DeepFace
+# from deepface import DeepFace
 
 
 # from sms import send_sms
