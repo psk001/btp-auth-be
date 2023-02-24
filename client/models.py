@@ -40,6 +40,18 @@ class ElectionCandidate(models.Model):
     def __str__(self):
         return self.name+'-'+self.election
 
+
+class Voter(models.Model):
+    name= models.TextField(max_length=100)
+    id= models.UUIDField(primary_key=True)
+    image= models.ImageField()
+    phone= models.IntegerField()
+    education= models.TextField()
+    dateOfBirth= models.DateField()
+
+    def __str__(self):
+        return self.name+'-'+self.id
+
 class Image(models.Model):
     title = models.CharField(max_length=100)
     image = models.ImageField(upload_to='images/')    

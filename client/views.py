@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Otp, Image, Election, ElectionCandidate
+from .models import Otp, Image, Election, ElectionCandidate, Voter
 from .serializers import ImageSerializer, OtpSerializer, ElectionSerializer, ElectionCandidateSerializer
 
 # from deepface import DeepFace
@@ -73,18 +73,24 @@ class OtpListApiView(APIView):
             'mobile': request.data.get('mobile'), 
             'otp': math.ceil(random.random()*1000000)
         }
-        serializer = OtpSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
 
-            # send_sms(
-            #     'Your OTP for login is: {}'.format(data['otp']),
-            #     '9741574592',
-            #     ['{}'.format(data['mobile'])],
-            #     fail_silently=False
-            # )
+        user= Voter.objects.filter(mobile= data['mobile'])
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if user: 
+            serializer = OtpSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+
+                # send_sms(
+                #     'Your OTP for login is: {}'.format(data['otp']),
+                #     '9741574592',
+                #     ['{}'.format(data['mobile'])],
+                #     fail_silently=False
+                # )
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'msg':'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

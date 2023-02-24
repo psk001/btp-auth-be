@@ -20,11 +20,17 @@ backends = [
 # )
 # print(face_objs)
 
-emotions = DeepFace.analyze(img_path = "/home/psk/Desktop/btp/django-auth/images/22.jpeg", 
-        actions = ['emotion']
-)
+emotions = DeepFace.analyze(img_path = "/home/psk/Desktop/btp/django-auth/images/32.jpeg", 
+        actions = ['age', 'gender', 'race','emotion']
+)[0]
 
-dominant_emotion= emotions[0]['dominant_emotion']
-dominant_emotion_value= emotions[0]['emotion']['{}'.format(dominant_emotion)]
+print('Facial Features: ')
+print('\tAge: ', emotions['age'])
+print('\n\tGender: ', emotions['gender'])
+print('\n\tRace: ', emotions['race'])
+print('\n\tEmotion: ', emotions['emotion'])
+dominant_emotion= emotions['dominant_emotion']
+dominant_emotion_value= emotions['emotion']['{}'.format(dominant_emotion)]
 
-print(dominant_emotion, dominant_emotion_value)
+print('\nDominant emotion: ', dominant_emotion)
+print('\nDominant emotion value: ', dominant_emotion_value)
