@@ -123,7 +123,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-SMS_BACKEND = 'sms.backends.messagebird.SmsBackend'
-MESSAGEBIRD_ACCESS_KEY = 'ZQTTIl9B0DmLWseLglXqa39Je' # test- 'rTuboSm75gz78od9vStMOXvHx'
